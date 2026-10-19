@@ -104,3 +104,4 @@ C:\Users\matee\Liftlog.vibecoded\build-check\LiftLog.runtimeconfig.json
 C:\Users\matee\Liftlog.vibecoded\build-check\LiftLog.dll
 C:\Users\matee\Liftlog.vibecoded\build-check\LiftLog.pdb
 C:\Users\matee\Liftlog.vibecoded\LiftLog\obj\Debug\net10.0\compressed\a5yfkwgqpp-{0}-lyrvbjmv5n-lyrvbjmv5n.gz
+C:\Users\matee\Liftlog.vibecoded\LiftLog\obj\Debug\net10.0\compressed\mwn6qb9qzy-{0}-b4am4v3nv5-b4am4v3nv5.gz

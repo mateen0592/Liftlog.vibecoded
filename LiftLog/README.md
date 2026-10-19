@@ -56,6 +56,10 @@ Workout weights must be zero or greater and repetitions must be positive. Blank 
 
 These were build, syntax and manual HTTP smoke checks; no automated test suite was run.
 
+### How I tested and fixed issues
+
+I checked the workout flow with HTTP submissions rather than relying only on the page loading. I saved a workout with several sets, then tried invalid inputs such as negative weight, zero repetitions, duplicate set numbers and selecting the same exercise twice. Those submissions were rejected and did not change the saved records. I also forced JSON save failures and checked that the application showed an error instead of presenting the unsaved plan or workout as saved. During implementation, I addressed these cases by validating the submitted set and exercise data and only updating the in-memory records after the JSON save succeeds. I checked malformed JSON separately to confirm the app could still start and show an empty history after preserving the bad file as a backup.
+
 ## Canvas submission description
 
 LiftLog is an ASP.NET Core MVC workout tracker for browsing a small exercise library, creating exercise-based plans, recording workouts with multiple sets and reviewing performance history. It stores plans and workout sessions locally in JSON between application restarts.
