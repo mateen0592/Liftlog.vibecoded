@@ -1,0 +1,62 @@
+@model LiftLog.Models.WorkoutHistoryViewModel
+
+@{
+    ViewData["Title"] = "Workout History";
+}
+
+<h1>Workout History</h1>
+
+@if (Model.Sessions.Count == 0)
+{
+    <p>No workouts have been logged yet.</p>
+}
+else
+{
+    <h2>Sessions</h2>
+    @foreach (var session in Model.Sessions)
+    {
+        <section>
+            <h3>@session.Date.ToString("d")</h3>
+            @foreach (var loggedExercise in session.Exercises)
+            {
+                <h4>@loggedExercise.Exercise.Name</h4>
+                <ul>
+                    @foreach (var set in loggedExercise.Sets)
+                    {
+                        <li>Set @set.SetNumber: @set.WeightKg kg x @set.Repetitions reps</li>
+                    }
+                </ul>
+            }
+        </section>
+    }
+
+    <h2>Latest Performance Compared with Previous Session</h2>
+    @foreach (var comparison in Model.Comparisons)
+    {
+        <section>
+            <h3>@comparison.Exercise.Name</h3>
+            <h4>Latest (@comparison.LatestWorkout.Date.ToString("d"))</h4>
+            <ul>
+                @foreach (var set in comparison.LatestWorkout.Exercises.First(item => item.Exercise.Id == comparison.Exercise.Id).Sets)
+                {
+                    <li>Set @set.SetNumber: @set.WeightKg kg x @set.Repetitions reps</li>
+                }
+            </ul>
+
+            @if (comparison.PreviousWorkout is null)
+            {
+                <p>No previous session for this exercise.</p>
+            }
+            else
+            {
+                <h4>Previous (@comparison.PreviousWorkout.Date.ToString("d"))</h4>
+                <ul>
+                    @foreach (var set in comparison.PreviousWorkout.Exercises.First(item => item.Exercise.Id == comparison.Exercise.Id).Sets)
+                    {
+                        <li>Set @set.SetNumber: @set.WeightKg kg x @set.Repetitions reps</li>
+                    }
+                </ul>
+            }
+        </section>
+    }
+}

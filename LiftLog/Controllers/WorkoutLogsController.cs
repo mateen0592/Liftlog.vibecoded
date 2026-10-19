@@ -94,6 +94,49 @@ public class WorkoutLogsController : Controller
         return RedirectToAction(nameof(Index));
     }
 
+    [HttpGet]
+    public IActionResult History()
+    {
+        var sessions = SavedWorkouts
+            .Select((workout, index) => new { Workout = workout, Index = index })
+            .OrderByDescending(item => item.Workout.Date)
+            .ThenByDescending(item => item.Index)
+            .Select(item => item.Workout)
+            .ToList();
+
+        var comparisons = SavedWorkouts
+            .SelectMany((workout, index) => workout.Exercises.Select(loggedExercise => new
+            {
+                Workout = workout,
+                LoggedExercise = loggedExercise,
+                Index = index
+            }))
+            .GroupBy(item => item.LoggedExercise.Exercise.Id)
+            .Select(group =>
+            {
+                var performances = group
+                    .OrderByDescending(item => item.Workout.Date)
+                    .ThenByDescending(item => item.Index)
+                    .Take(2)
+                    .ToList();
+
+                return new ExercisePerformanceComparison
+                {
+                    Exercise = performances[0].LoggedExercise.Exercise,
+                    LatestWorkout = performances[0].Workout,
+                    PreviousWorkout = performances.Count > 1 ? performances[1].Workout : null
+                };
+            })
+            .OrderBy(item => item.Exercise.Name)
+            .ToList();
+
+        return View(new WorkoutHistoryViewModel
+        {
+            Sessions = sessions,
+            Comparisons = comparisons
+        });
+    }
+
     private WorkoutLogFormViewModel CreateViewModel()
     {
         var exercises = _exerciseService.GetAll();
