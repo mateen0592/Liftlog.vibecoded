@@ -1,0 +1,65 @@
+@model LiftLog.Models.WorkoutLogFormViewModel
+
+@{
+    ViewData["Title"] = "Log a Workout";
+}
+
+<h1>Log a Workout</h1>
+
+<form asp-action="Index" method="post">
+    <div asp-validation-summary="All"></div>
+
+    <p>
+        <label asp-for="Date">Workout date</label>
+        <input asp-for="Date" type="date" />
+        <span asp-validation-for="Date"></span>
+    </p>
+
+    @for (var exerciseIndex = 0; exerciseIndex < Model.ExerciseEntries.Count; exerciseIndex++)
+    {
+        var exerciseEntry = Model.ExerciseEntries[exerciseIndex];
+        var exercise = Model.AvailableExercises.First(item => item.Id == exerciseEntry.ExerciseId);
+        <fieldset>
+            <legend>@exercise.Name (@exercise.MuscleGroup)</legend>
+            <input asp-for="ExerciseEntries[exerciseIndex].ExerciseId" type="hidden" />
+
+            @for (var setIndex = 0; setIndex < exerciseEntry.Sets.Count; setIndex++)
+            {
+                <div>
+                    <strong>Set @exerciseEntry.Sets[setIndex].SetNumber</strong>
+                    <input asp-for="ExerciseEntries[exerciseIndex].Sets[setIndex].SetNumber" type="hidden" />
+                    <label asp-for="ExerciseEntries[exerciseIndex].Sets[setIndex].WeightKg">Weight (kg)</label>
+                    <input asp-for="ExerciseEntries[exerciseIndex].Sets[setIndex].WeightKg" type="number" min="0" step="0.1" />
+                    <span asp-validation-for="ExerciseEntries[exerciseIndex].Sets[setIndex].WeightKg"></span>
+                    <label asp-for="ExerciseEntries[exerciseIndex].Sets[setIndex].Repetitions">Repetitions</label>
+                    <input asp-for="ExerciseEntries[exerciseIndex].Sets[setIndex].Repetitions" type="number" min="1" />
+                    <span asp-validation-for="ExerciseEntries[exerciseIndex].Sets[setIndex].Repetitions"></span>
+                    <span asp-validation-for="ExerciseEntries[exerciseIndex].Sets[setIndex]"></span>
+                </div>
+            }
+        </fieldset>
+    }
+
+    <button type="submit">Save workout</button>
+</form>
+
+@if (Model.SavedWorkouts.Count > 0)
+{
+    <h2>Logged Workouts</h2>
+    @foreach (var workout in Model.SavedWorkouts)
+    {
+        <section>
+            <h3>@workout.Date.ToString("d")</h3>
+            @foreach (var loggedExercise in workout.Exercises)
+            {
+                <h4>@loggedExercise.Exercise.Name</h4>
+                <ul>
+                    @foreach (var set in loggedExercise.Sets)
+                    {
+                        <li>Set @set.SetNumber: @set.WeightKg kg x @set.Repetitions reps</li>
+                    }
+                </ul>
+            }
+        </section>
+    }
+}
