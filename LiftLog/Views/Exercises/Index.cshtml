@@ -1,0 +1,14 @@
+@model IReadOnlyList<LiftLog.Models.Exercise>
+
+@{
+    ViewData["Title"] = "Exercises";
+}
+
+<h1>Exercises</h1>
+
+<ul>
+    @foreach (var exercise in Model)
+    {
+        <li>@exercise.Name - @exercise.MuscleGroup</li>
+    }
+</ul>
