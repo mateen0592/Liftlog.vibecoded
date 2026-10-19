@@ -1,0 +1,51 @@
+@model LiftLog.Models.WorkoutPlanFormViewModel
+
+@{
+    ViewData["Title"] = "Workout Plans";
+}
+
+<h1>Create a Workout Plan</h1>
+
+<form asp-action="Index" method="post">
+    <div asp-validation-summary="ModelOnly"></div>
+
+    <p>
+        <label asp-for="Name">Plan name</label>
+        <input asp-for="Name" required />
+        <span asp-validation-for="Name"></span>
+    </p>
+
+    <fieldset>
+        <legend>Select exercises</legend>
+        @foreach (var exercise in Model.AvailableExercises)
+        {
+            <div>
+                <input type="checkbox" name="SelectedExerciseIds" value="@exercise.Id"
+                       checked="@(Model.SelectedExerciseIds.Contains(exercise.Id))" id="exercise-@exercise.Id" />
+                <label for="exercise-@exercise.Id">@exercise.Name (@exercise.MuscleGroup)</label>
+            </div>
+        }
+        <span asp-validation-for="SelectedExerciseIds"></span>
+    </fieldset>
+
+    <button type="submit">Save plan</button>
+</form>
+
+@if (Model.SavedPlans.Count > 0)
+{
+    <h2>Saved Plans</h2>
+    <ul>
+        @foreach (var plan in Model.SavedPlans)
+        {
+            <li>
+                <strong>@plan.Name</strong>
+                <ul>
+                    @foreach (var exercise in plan.Exercises)
+                    {
+                        <li>@exercise.Name (@exercise.MuscleGroup)</li>
+                    }
+                </ul>
+            </li>
+        }
+    </ul>
+}
