@@ -4,59 +4,94 @@
     ViewData["Title"] = "Workout History";
 }
 
-<h1>Workout History</h1>
+<div class="page-heading">
+    <p class="eyebrow">YOUR TRAINING RECORD</p>
+    <h1>Workout history</h1>
+    <p>Review past sessions and compare your latest work with the session before it.</p>
+</div>
 
 @if (Model.Sessions.Count == 0)
 {
-    <p>No workouts have been logged yet.</p>
+    <div class="empty-state">
+        <span class="empty-mark" aria-hidden="true">—</span>
+        <h2>No workouts logged yet</h2>
+        <p>Your saved sessions will appear here.</p>
+        <a class="button button-primary" asp-action="Index">Log your first workout</a>
+    </div>
 }
 else
 {
-    <h2>Sessions</h2>
+    <div class="section-heading"><p class="eyebrow">ALL SESSIONS</p><h2>Training history</h2></div>
+    <div class="record-list">
     @foreach (var session in Model.Sessions)
     {
-        <section>
-            <h3>@session.Date.ToString("d")</h3>
+        <section class="record-card">
+            <h3 class="session-date">@session.Date.ToString("d")</h3>
             @foreach (var loggedExercise in session.Exercises)
             {
-                <h4>@loggedExercise.Exercise.Name</h4>
-                <ul>
-                    @foreach (var set in loggedExercise.Sets)
-                    {
-                        <li>Set @set.SetNumber: @set.WeightKg kg x @set.Repetitions reps</li>
-                    }
-                </ul>
+                <div class="record-exercise">
+                    <h4>@loggedExercise.Exercise.Name <span class="tag">@loggedExercise.Exercise.MuscleGroup</span></h4>
+                    <div class="table-scroll">
+                        <table class="record-table">
+                            <thead><tr><th scope="col">Set</th><th scope="col">Weight</th><th scope="col">Reps</th></tr></thead>
+                            <tbody>
+                            @foreach (var set in loggedExercise.Sets)
+                            {
+                                <tr><th scope="row">@set.SetNumber</th><td>@set.WeightKg kg</td><td>@set.Repetitions</td></tr>
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             }
         </section>
     }
+    </div>
 
-    <h2>Latest Performance Compared with Previous Session</h2>
+    <div class="section-heading comparison-heading"><p class="eyebrow">SESSION TO SESSION</p><h2>Latest performance</h2><p>Each exercise is compared with the most recent previous session that included it.</p></div>
+    <div class="comparison-grid">
     @foreach (var comparison in Model.Comparisons)
     {
-        <section>
-            <h3>@comparison.Exercise.Name</h3>
-            <h4>Latest (@comparison.LatestWorkout.Date.ToString("d"))</h4>
-            <ul>
-                @foreach (var set in comparison.LatestWorkout.Exercises.First(item => item.Exercise.Id == comparison.Exercise.Id).Sets)
-                {
-                    <li>Set @set.SetNumber: @set.WeightKg kg x @set.Repetitions reps</li>
-                }
-            </ul>
-
-            @if (comparison.PreviousWorkout is null)
-            {
-                <p>No previous session for this exercise.</p>
-            }
-            else
-            {
-                <h4>Previous (@comparison.PreviousWorkout.Date.ToString("d"))</h4>
-                <ul>
-                    @foreach (var set in comparison.PreviousWorkout.Exercises.First(item => item.Exercise.Id == comparison.Exercise.Id).Sets)
+        <section class="comparison-card">
+            <h3>@comparison.Exercise.Name <span class="tag">@comparison.Exercise.MuscleGroup</span></h3>
+            <div class="comparison-columns">
+                <div>
+                    <h4>Latest <span>@comparison.LatestWorkout.Date.ToString("d")</span></h4>
+                    <div class="table-scroll">
+                        <table class="record-table compact-table">
+                            <thead><tr><th scope="col">Set</th><th scope="col">kg</th><th scope="col">Reps</th></tr></thead>
+                            <tbody>
+                            @foreach (var set in comparison.LatestWorkout.Exercises.First(item => item.Exercise.Id == comparison.Exercise.Id).Sets)
+                            {
+                                <tr><th scope="row">@set.SetNumber</th><td>@set.WeightKg</td><td>@set.Repetitions</td></tr>
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div>
+                    @if (comparison.PreviousWorkout is null)
                     {
-                        <li>Set @set.SetNumber: @set.WeightKg kg x @set.Repetitions reps</li>
+                        <h4>Previous</h4><p class="field-hint">No earlier session for this exercise.</p>
                     }
-                </ul>
-            }
+                    else
+                    {
+                        <h4>Previous <span>@comparison.PreviousWorkout.Date.ToString("d")</span></h4>
+                        <div class="table-scroll">
+                            <table class="record-table compact-table">
+                                <thead><tr><th scope="col">Set</th><th scope="col">kg</th><th scope="col">Reps</th></tr></thead>
+                                <tbody>
+                                @foreach (var set in comparison.PreviousWorkout.Exercises.First(item => item.Exercise.Id == comparison.Exercise.Id).Sets)
+                                {
+                                    <tr><th scope="row">@set.SetNumber</th><td>@set.WeightKg</td><td>@set.Repetitions</td></tr>
+                                }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
         </section>
     }
+    </div>
 }

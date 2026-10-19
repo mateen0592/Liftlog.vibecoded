@@ -4,62 +4,84 @@
     ViewData["Title"] = "Log a Workout";
 }
 
-<h1>Log a Workout</h1>
+<div class="page-heading">
+    <p class="eyebrow">CAPTURE THE WORK</p>
+    <h1>Log a workout</h1>
+    <p>Enter the date and the weight and reps for each set you completed.</p>
+</div>
 
-<form asp-action="Index" method="post">
-    <div asp-validation-summary="All"></div>
+<form asp-action="Index" method="post" class="log-form">
+    <div asp-validation-summary="All" class="validation-summary"></div>
 
-    <p>
-        <label asp-for="Date">Workout date</label>
-        <input asp-for="Date" type="date" />
-        <span asp-validation-for="Date"></span>
-    </p>
+    <div class="form-panel date-panel">
+        <div class="form-field">
+            <label asp-for="Date">Workout date</label>
+            <input asp-for="Date" type="date" class="text-input date-input" />
+            <span asp-validation-for="Date" class="field-validation"></span>
+        </div>
+    </div>
 
     @for (var exerciseIndex = 0; exerciseIndex < Model.ExerciseEntries.Count; exerciseIndex++)
     {
         var exerciseEntry = Model.ExerciseEntries[exerciseIndex];
         var exercise = Model.AvailableExercises.First(item => item.Id == exerciseEntry.ExerciseId);
-        <fieldset>
-            <legend>@exercise.Name (@exercise.MuscleGroup)</legend>
+        <fieldset class="log-exercise-card">
+            <legend>@exercise.Name <span class="tag">@exercise.MuscleGroup</span></legend>
             <input asp-for="ExerciseEntries[exerciseIndex].ExerciseId" type="hidden" />
 
+            <div class="set-grid set-grid-heading" aria-hidden="true">
+                <span>Set</span><span>Weight (kg)</span><span>Repetitions</span>
+            </div>
             @for (var setIndex = 0; setIndex < exerciseEntry.Sets.Count; setIndex++)
             {
-                <div>
-                    <strong>Set @exerciseEntry.Sets[setIndex].SetNumber</strong>
+                <div class="set-grid set-row">
+                    <strong class="set-number">@exerciseEntry.Sets[setIndex].SetNumber</strong>
                     <input asp-for="ExerciseEntries[exerciseIndex].Sets[setIndex].SetNumber" type="hidden" />
-                    <label asp-for="ExerciseEntries[exerciseIndex].Sets[setIndex].WeightKg">Weight (kg)</label>
-                    <input asp-for="ExerciseEntries[exerciseIndex].Sets[setIndex].WeightKg" type="number" min="0" step="0.1" />
-                    <span asp-validation-for="ExerciseEntries[exerciseIndex].Sets[setIndex].WeightKg"></span>
-                    <label asp-for="ExerciseEntries[exerciseIndex].Sets[setIndex].Repetitions">Repetitions</label>
-                    <input asp-for="ExerciseEntries[exerciseIndex].Sets[setIndex].Repetitions" type="number" min="1" />
-                    <span asp-validation-for="ExerciseEntries[exerciseIndex].Sets[setIndex].Repetitions"></span>
-                    <span asp-validation-for="ExerciseEntries[exerciseIndex].Sets[setIndex]"></span>
+                    <div class="form-field">
+                        <label class="mobile-field-label" asp-for="ExerciseEntries[exerciseIndex].Sets[setIndex].WeightKg">Weight (kg)</label>
+                        <input asp-for="ExerciseEntries[exerciseIndex].Sets[setIndex].WeightKg" type="number" min="0" step="0.1" class="text-input" placeholder="e.g. 60" />
+                        <span asp-validation-for="ExerciseEntries[exerciseIndex].Sets[setIndex].WeightKg" class="field-validation"></span>
+                    </div>
+                    <div class="form-field">
+                        <label class="mobile-field-label" asp-for="ExerciseEntries[exerciseIndex].Sets[setIndex].Repetitions">Repetitions</label>
+                        <input asp-for="ExerciseEntries[exerciseIndex].Sets[setIndex].Repetitions" type="number" min="1" class="text-input" placeholder="e.g. 8" />
+                        <span asp-validation-for="ExerciseEntries[exerciseIndex].Sets[setIndex].Repetitions" class="field-validation"></span>
+                    </div>
+                    <span asp-validation-for="ExerciseEntries[exerciseIndex].Sets[setIndex]" class="field-validation set-row-validation"></span>
                 </div>
             }
         </fieldset>
     }
 
-    <button type="submit">Save workout</button>
+    <button type="submit" class="button button-primary">Save workout</button>
 </form>
 
 @if (Model.SavedWorkouts.Count > 0)
 {
-    <h2>Logged Workouts</h2>
-    @foreach (var workout in Model.SavedWorkouts)
+    <div class="section-heading"><p class="eyebrow">RECENT ENTRIES</p><h2>Logged workouts</h2><a asp-action="History">View full history →</a></div>
+    <div class="record-list">
+    @foreach (var workout in Model.SavedWorkouts.OrderByDescending(item => item.Date))
     {
-        <section>
+        <section class="record-card">
             <h3>@workout.Date.ToString("d")</h3>
             @foreach (var loggedExercise in workout.Exercises)
             {
-                <h4>@loggedExercise.Exercise.Name</h4>
-                <ul>
-                    @foreach (var set in loggedExercise.Sets)
-                    {
-                        <li>Set @set.SetNumber: @set.WeightKg kg x @set.Repetitions reps</li>
-                    }
-                </ul>
+                <div class="record-exercise">
+                    <h4>@loggedExercise.Exercise.Name <span class="tag">@loggedExercise.Exercise.MuscleGroup</span></h4>
+                    <div class="table-scroll">
+                        <table class="record-table">
+                            <thead><tr><th scope="col">Set</th><th scope="col">Weight</th><th scope="col">Reps</th></tr></thead>
+                            <tbody>
+                            @foreach (var set in loggedExercise.Sets)
+                            {
+                                <tr><th scope="row">@set.SetNumber</th><td>@set.WeightKg kg</td><td>@set.Repetitions</td></tr>
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             }
         </section>
     }
+    </div>
 }

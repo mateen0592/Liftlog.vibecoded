@@ -2,7 +2,24 @@
     ViewData["Title"] = "LiftLog";
 }
 
-<div>
+<section class="hero-panel">
+    <p class="eyebrow">YOUR TRAINING, IN ONE PLACE</p>
     <h1>My Workout Tracker</h1>
-    <p>LiftLog helps you keep track of your workouts.</p>
-</div>
+    <p class="hero-copy">LiftLog helps you plan training, record every set and see how your workouts progress over time.</p>
+    <div class="hero-actions">
+        <a class="button button-primary" asp-controller="WorkoutLogs" asp-action="Index">Log a workout</a>
+        <a class="button button-secondary" asp-controller="WorkoutPlans" asp-action="Index">Build a plan</a>
+    </div>
+</section>
+
+<section class="home-links" aria-label="LiftLog sections">
+    <a class="feature-card" asp-controller="Exercises" asp-action="Index">
+        <span class="feature-number">01</span><h2>Exercise library</h2><p>Browse your exercise list.</p><span class="card-arrow" aria-hidden="true">→</span>
+    </a>
+    <a class="feature-card" asp-controller="WorkoutPlans" asp-action="Index">
+        <span class="feature-number">02</span><h2>Workout plans</h2><p>Put together a session plan.</p><span class="card-arrow" aria-hidden="true">→</span>
+    </a>
+    <a class="feature-card" asp-controller="WorkoutLogs" asp-action="History">
+        <span class="feature-number">03</span><h2>Workout history</h2><p>Review your past sessions.</p><span class="card-arrow" aria-hidden="true">→</span>
+    </a>
+</section>

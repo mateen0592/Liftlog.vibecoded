@@ -4,45 +4,52 @@
     ViewData["Title"] = "Workout Plans";
 }
 
-<h1>Create a Workout Plan</h1>
+<div class="page-heading">
+    <p class="eyebrow">BUILD YOUR SESSION</p>
+    <h1>Workout plans</h1>
+    <p>Give your plan a name and pick the exercises you want to include.</p>
+</div>
 
-<form asp-action="Index" method="post">
-    <div asp-validation-summary="ModelOnly"></div>
+<form asp-action="Index" method="post" class="form-panel">
+    <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
 
-    <p>
+    <div class="form-field">
         <label asp-for="Name">Plan name</label>
-        <input asp-for="Name" required />
-        <span asp-validation-for="Name"></span>
-    </p>
+        <input asp-for="Name" class="text-input" placeholder="e.g. Upper body A" required />
+        <span asp-validation-for="Name" class="field-validation"></span>
+    </div>
 
-    <fieldset>
+    <fieldset class="choice-fieldset">
         <legend>Select exercises</legend>
+        <p class="field-hint">Choose one or more movements.</p>
+        <div class="choice-grid">
         @foreach (var exercise in Model.AvailableExercises)
         {
-            <div>
+            <div class="choice-card">
                 <input type="checkbox" name="SelectedExerciseIds" value="@exercise.Id"
                        checked="@(Model.SelectedExerciseIds.Contains(exercise.Id))" id="exercise-@exercise.Id" />
-                <label for="exercise-@exercise.Id">@exercise.Name (@exercise.MuscleGroup)</label>
+                <label for="exercise-@exercise.Id"><strong>@exercise.Name</strong><span>@exercise.MuscleGroup</span></label>
             </div>
         }
-        <span asp-validation-for="SelectedExerciseIds"></span>
+        </div>
+        <span asp-validation-for="SelectedExerciseIds" class="field-validation"></span>
     </fieldset>
 
-    <button type="submit">Save plan</button>
+    <button type="submit" class="button button-primary">Save plan</button>
 </form>
 
 @if (Model.SavedPlans.Count > 0)
 {
-    <h2>Saved Plans</h2>
-    <ul>
+    <div class="section-heading"><p class="eyebrow">YOUR LIBRARY</p><h2>Saved plans</h2></div>
+    <ul class="plan-grid">
         @foreach (var plan in Model.SavedPlans)
         {
-            <li>
-                <strong>@plan.Name</strong>
-                <ul>
+            <li class="plan-card">
+                <h3>@plan.Name</h3>
+                <ul class="plain-list">
                     @foreach (var exercise in plan.Exercises)
                     {
-                        <li>@exercise.Name (@exercise.MuscleGroup)</li>
+                        <li><span>@exercise.Name</span><span class="tag">@exercise.MuscleGroup</span></li>
                     }
                 </ul>
             </li>

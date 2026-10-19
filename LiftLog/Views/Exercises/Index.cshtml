@@ -4,11 +4,19 @@
     ViewData["Title"] = "Exercises";
 }
 
-<h1>Exercises</h1>
+<div class="page-heading">
+    <p class="eyebrow">THE MOVEMENT CATALOG</p>
+    <h1>Exercise library</h1>
+    <p>Choose from these movements when building a plan or logging a session.</p>
+</div>
 
-<ul>
+<ul class="exercise-grid">
     @foreach (var exercise in Model)
     {
-        <li>@exercise.Name - @exercise.MuscleGroup</li>
+        <li class="exercise-card">
+            <span class="exercise-icon" aria-hidden="true">+</span>
+            <h2>@exercise.Name</h2>
+            <span class="tag">@exercise.MuscleGroup</span>
+        </li>
     }
 </ul>
