@@ -3,8 +3,12 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddSingleton<LiftLog.Services.IExerciseService, LiftLog.Services.ExerciseService>();
+builder.Services.AddSingleton<LiftLog.Services.IWorkoutDataStore, LiftLog.Services.JsonWorkoutDataStore>();
 
 var app = builder.Build();
+
+// Load saved plans and workout history before serving requests.
+_ = app.Services.GetRequiredService<LiftLog.Services.IWorkoutDataStore>();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

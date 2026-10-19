@@ -7,12 +7,13 @@ namespace LiftLog.Controllers;
 public class WorkoutLogsController : Controller
 {
     private const int SetRowsPerExercise = 3;
-    private static readonly List<WorkoutLog> SavedWorkouts = [];
     private readonly IExerciseService _exerciseService;
+    private readonly IWorkoutDataStore _workoutDataStore;
 
-    public WorkoutLogsController(IExerciseService exerciseService)
+    public WorkoutLogsController(IExerciseService exerciseService, IWorkoutDataStore workoutDataStore)
     {
         _exerciseService = exerciseService;
+        _workoutDataStore = workoutDataStore;
     }
 
     [HttpGet]
@@ -86,25 +87,26 @@ public class WorkoutLogsController : Controller
         if (!ModelState.IsValid)
         {
             form.AvailableExercises = availableExercises;
-            form.SavedWorkouts = SavedWorkouts.ToList();
+            form.SavedWorkouts = _workoutDataStore.GetWorkouts();
             return View(form);
         }
 
-        SavedWorkouts.Add(new WorkoutLog { Date = form.Date.Date, Exercises = loggedExercises });
+        _workoutDataStore.AddWorkout(new WorkoutLog { Date = form.Date.Date, Exercises = loggedExercises });
         return RedirectToAction(nameof(Index));
     }
 
     [HttpGet]
     public IActionResult History()
     {
-        var sessions = SavedWorkouts
+        var savedWorkouts = _workoutDataStore.GetWorkouts();
+        var sessions = savedWorkouts
             .Select((workout, index) => new { Workout = workout, Index = index })
             .OrderByDescending(item => item.Workout.Date)
             .ThenByDescending(item => item.Index)
             .Select(item => item.Workout)
             .ToList();
 
-        var comparisons = SavedWorkouts
+        var comparisons = savedWorkouts
             .SelectMany((workout, index) => workout.Exercises.Select(loggedExercise => new
             {
                 Workout = workout,
@@ -143,7 +145,7 @@ public class WorkoutLogsController : Controller
         return new WorkoutLogFormViewModel
         {
             AvailableExercises = exercises,
-            SavedWorkouts = SavedWorkouts.ToList(),
+            SavedWorkouts = _workoutDataStore.GetWorkouts(),
             ExerciseEntries = exercises.Select(exercise => new ExerciseLogInput
             {
                 ExerciseId = exercise.Id,

@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("LiftLog")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d04ff3fc9c062994d2a3f19381ff69fc714b0233")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+79f75e84bf54021b966815b56346316fd6c9018f")]
 [assembly: System.Reflection.AssemblyProductAttribute("LiftLog")]
 [assembly: System.Reflection.AssemblyTitleAttribute("LiftLog")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

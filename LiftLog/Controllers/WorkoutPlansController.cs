@@ -6,12 +6,13 @@ namespace LiftLog.Controllers;
 
 public class WorkoutPlansController : Controller
 {
-    private static readonly List<WorkoutPlan> SavedPlans = [];
     private readonly IExerciseService _exerciseService;
+    private readonly IWorkoutDataStore _workoutDataStore;
 
-    public WorkoutPlansController(IExerciseService exerciseService)
+    public WorkoutPlansController(IExerciseService exerciseService, IWorkoutDataStore workoutDataStore)
     {
         _exerciseService = exerciseService;
+        _workoutDataStore = workoutDataStore;
     }
 
     [HttpGet]
@@ -47,17 +48,17 @@ public class WorkoutPlansController : Controller
         if (!ModelState.IsValid)
         {
             form.AvailableExercises = availableExercises;
-            form.SavedPlans = SavedPlans.ToList();
+            form.SavedPlans = _workoutDataStore.GetPlans();
             return View(form);
         }
 
-        SavedPlans.Add(new WorkoutPlan { Name = form.Name.Trim(), Exercises = selectedExercises });
+        _workoutDataStore.AddPlan(new WorkoutPlan { Name = form.Name.Trim(), Exercises = selectedExercises });
         return RedirectToAction(nameof(Index));
     }
 
     private WorkoutPlanFormViewModel CreateViewModel() => new()
     {
         AvailableExercises = _exerciseService.GetAll(),
-        SavedPlans = SavedPlans.ToList()
+        SavedPlans = _workoutDataStore.GetPlans()
     };
 }
