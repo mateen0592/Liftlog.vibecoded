@@ -25,7 +25,7 @@
     {
         var exerciseEntry = Model.ExerciseEntries[exerciseIndex];
         var exercise = Model.AvailableExercises.First(item => item.Id == exerciseEntry.ExerciseId);
-        <fieldset class="log-exercise-card">
+        <fieldset class="log-exercise-card" data-exercise-entry>
             <legend>@exercise.Name <span class="tag">@exercise.MuscleGroup</span></legend>
             <input asp-for="ExerciseEntries[exerciseIndex].ExerciseId" type="hidden" />
 
@@ -50,6 +50,7 @@
                     <span asp-validation-for="ExerciseEntries[exerciseIndex].Sets[setIndex]" class="field-validation set-row-validation"></span>
                 </div>
             }
+            <button type="button" class="button button-secondary add-set-button" data-add-set data-max-sets="50">Add another set</button>
         </fieldset>
     }
 
@@ -84,4 +85,8 @@
         </section>
     }
     </div>
+}
+
+@section Scripts {
+    <script src="~/js/workout-log.js" asp-append-version="true"></script>
 }

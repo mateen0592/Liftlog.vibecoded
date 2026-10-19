@@ -21,7 +21,6 @@ C:\Users\matee\Liftlog.vibecoded\LiftLog\obj\Debug\net10.0\rjsmcshtml.dswa.cache
 C:\Users\matee\Liftlog.vibecoded\LiftLog\obj\Debug\net10.0\scopedcss\Views\Shared\_Layout.cshtml.rz.scp.css
 C:\Users\matee\Liftlog.vibecoded\LiftLog\obj\Debug\net10.0\scopedcss\bundle\LiftLog.styles.css
 C:\Users\matee\Liftlog.vibecoded\LiftLog\obj\Debug\net10.0\scopedcss\projectbundle\LiftLog.bundle.scp.css
-C:\Users\matee\Liftlog.vibecoded\LiftLog\obj\Debug\net10.0\compressed\a5yfkwgqpp-{0}-b9sayid5wm-b9sayid5wm.gz
 C:\Users\matee\Liftlog.vibecoded\LiftLog\obj\Debug\net10.0\compressed\65qktguldj-{0}-61n19gt1b8-61n19gt1b8.gz
 C:\Users\matee\Liftlog.vibecoded\LiftLog\obj\Debug\net10.0\compressed\lpwebs405x-{0}-xtxxf3hu2r-xtxxf3hu2r.gz
 C:\Users\matee\Liftlog.vibecoded\LiftLog\obj\Debug\net10.0\compressed\9yp9b37gby-{0}-bqjiyaj88i-bqjiyaj88i.gz
@@ -104,3 +103,4 @@ C:\Users\matee\Liftlog.vibecoded\build-check\LiftLog.deps.json
 C:\Users\matee\Liftlog.vibecoded\build-check\LiftLog.runtimeconfig.json
 C:\Users\matee\Liftlog.vibecoded\build-check\LiftLog.dll
 C:\Users\matee\Liftlog.vibecoded\build-check\LiftLog.pdb
+C:\Users\matee\Liftlog.vibecoded\LiftLog\obj\Debug\net10.0\compressed\a5yfkwgqpp-{0}-lyrvbjmv5n-lyrvbjmv5n.gz

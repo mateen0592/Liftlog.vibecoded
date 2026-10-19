@@ -6,7 +6,8 @@ namespace LiftLog.Controllers;
 
 public class WorkoutLogsController : Controller
 {
-    private const int SetRowsPerExercise = 3;
+    private const int InitialSetRows = 3;
+    private const int MaxSetsPerExercise = 50;
     private readonly IExerciseService _exerciseService;
     private readonly IWorkoutDataStore _workoutDataStore;
 
@@ -29,6 +30,7 @@ public class WorkoutLogsController : Controller
         var availableExercises = _exerciseService.GetAll();
         var loggedExercises = new List<LoggedExercise>();
         var completedSetCount = 0;
+        var usedExerciseIds = new HashSet<int>();
 
         for (var exerciseIndex = 0; exerciseIndex < form.ExerciseEntries.Count; exerciseIndex++)
         {
@@ -40,10 +42,35 @@ public class WorkoutLogsController : Controller
                 continue;
             }
 
+            if (!usedExerciseIds.Add(exercise.Id))
+            {
+                ModelState.AddModelError($"ExerciseEntries[{exerciseIndex}].ExerciseId", "An exercise can only be included once in a workout.");
+                continue;
+            }
+
+            if (entry.Sets.Count > MaxSetsPerExercise)
+            {
+                ModelState.AddModelError($"ExerciseEntries[{exerciseIndex}].Sets", $"A maximum of {MaxSetsPerExercise} sets can be logged for one exercise.");
+                continue;
+            }
+
             var completedSets = new List<WorkoutSet>();
+            var usedSetNumbers = new HashSet<int>();
             for (var setIndex = 0; setIndex < entry.Sets.Count; setIndex++)
             {
                 var set = entry.Sets[setIndex];
+                if (set.SetNumber < 1 || set.SetNumber > MaxSetsPerExercise)
+                {
+                    ModelState.AddModelError($"ExerciseEntries[{exerciseIndex}].Sets[{setIndex}].SetNumber", $"Set number must be between 1 and {MaxSetsPerExercise}.");
+                    continue;
+                }
+
+                if (!usedSetNumbers.Add(set.SetNumber))
+                {
+                    ModelState.AddModelError($"ExerciseEntries[{exerciseIndex}].Sets[{setIndex}].SetNumber", "Set numbers must be unique for each exercise.");
+                    continue;
+                }
+
                 var hasWeight = set.WeightKg.HasValue;
                 var hasRepetitions = set.Repetitions.HasValue;
 
@@ -55,12 +82,6 @@ public class WorkoutLogsController : Controller
                 if (hasWeight != hasRepetitions)
                 {
                     ModelState.AddModelError($"ExerciseEntries[{exerciseIndex}].Sets[{setIndex}]", "Enter both weight and repetitions for each set.");
-                    continue;
-                }
-
-                if (set.SetNumber < 1 || set.SetNumber > SetRowsPerExercise)
-                {
-                    ModelState.AddModelError($"ExerciseEntries[{exerciseIndex}].Sets[{setIndex}].SetNumber", "Invalid set number.");
                     continue;
                 }
 
@@ -91,7 +112,17 @@ public class WorkoutLogsController : Controller
             return View(form);
         }
 
-        _workoutDataStore.AddWorkout(new WorkoutLog { Date = form.Date.Date, Exercises = loggedExercises });
+        try
+        {
+            _workoutDataStore.AddWorkout(new WorkoutLog { Date = form.Date.Date, Exercises = loggedExercises });
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        {
+            ModelState.AddModelError(string.Empty, "The workout could not be saved. Check access to the data file and try again.");
+            form.AvailableExercises = availableExercises;
+            form.SavedWorkouts = _workoutDataStore.GetWorkouts();
+            return View(form);
+        }
         return RedirectToAction(nameof(Index));
     }
 
@@ -149,7 +180,7 @@ public class WorkoutLogsController : Controller
             ExerciseEntries = exercises.Select(exercise => new ExerciseLogInput
             {
                 ExerciseId = exercise.Id,
-                Sets = Enumerable.Range(1, SetRowsPerExercise)
+                Sets = Enumerable.Range(1, InitialSetRows)
                     .Select(number => new WorkoutSetInput { SetNumber = number })
                     .ToList()
             }).ToList()

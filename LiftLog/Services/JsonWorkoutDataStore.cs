@@ -46,8 +46,9 @@ public class JsonWorkoutDataStore : IWorkoutDataStore
     {
         lock (_lock)
         {
-            _plans.Add(plan);
-            SaveData();
+            var updatedPlans = _plans.Append(plan).ToList();
+            SaveData(updatedPlans, _workouts);
+            _plans = updatedPlans;
         }
     }
 
@@ -55,8 +56,9 @@ public class JsonWorkoutDataStore : IWorkoutDataStore
     {
         lock (_lock)
         {
-            _workouts.Add(workout);
-            SaveData();
+            var updatedWorkouts = _workouts.Append(workout).ToList();
+            SaveData(_plans, updatedWorkouts);
+            _workouts = updatedWorkouts;
         }
     }
 
@@ -71,21 +73,47 @@ public class JsonWorkoutDataStore : IWorkoutDataStore
         {
             var json = File.ReadAllText(_filePath);
             var data = JsonSerializer.Deserialize<StoredWorkoutData>(json, JsonOptions);
+            if (data is null)
+            {
+                throw new JsonException("The workout data file did not contain a data object.");
+            }
+
             return (data?.Plans ?? [], data?.Workouts ?? []);
         }
-        catch (Exception exception) when (exception is JsonException or IOException or UnauthorizedAccessException)
+        catch (JsonException exception)
+        {
+            var backupPath = PreserveInvalidFile();
+            _logger.LogWarning(exception, "Invalid workout data at {FilePath}; starting with empty data. Backup: {BackupPath}", _filePath, backupPath ?? "not moved");
+            return ([], []);
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
         {
             _logger.LogWarning(exception, "Could not load workout data from {FilePath}; starting with empty data.", _filePath);
             return ([], []);
         }
     }
 
-    private void SaveData()
+    private string? PreserveInvalidFile()
+    {
+        try
+        {
+            var backupPath = $"{_filePath}.corrupt-{DateTime.UtcNow:yyyyMMddHHmmssfff}-{Guid.NewGuid():N}.json";
+            File.Move(_filePath, backupPath);
+            return backupPath;
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        {
+            _logger.LogWarning(exception, "Could not move invalid workout data file {FilePath} to a backup.", _filePath);
+            return null;
+        }
+    }
+
+    private void SaveData(List<WorkoutPlan> plans, List<WorkoutLog> workouts)
     {
         var directory = Path.GetDirectoryName(_filePath)!;
         Directory.CreateDirectory(directory);
         var temporaryPath = _filePath + ".tmp";
-        var json = JsonSerializer.Serialize(new StoredWorkoutData { Plans = _plans, Workouts = _workouts }, JsonOptions);
+        var json = JsonSerializer.Serialize(new StoredWorkoutData { Plans = plans, Workouts = workouts }, JsonOptions);
 
         try
         {

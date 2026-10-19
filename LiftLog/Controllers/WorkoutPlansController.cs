@@ -52,7 +52,17 @@ public class WorkoutPlansController : Controller
             return View(form);
         }
 
-        _workoutDataStore.AddPlan(new WorkoutPlan { Name = form.Name.Trim(), Exercises = selectedExercises });
+        try
+        {
+            _workoutDataStore.AddPlan(new WorkoutPlan { Name = form.Name.Trim(), Exercises = selectedExercises });
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        {
+            ModelState.AddModelError(string.Empty, "The plan could not be saved. Check access to the data file and try again.");
+            form.AvailableExercises = availableExercises;
+            form.SavedPlans = _workoutDataStore.GetPlans();
+            return View(form);
+        }
         return RedirectToAction(nameof(Index));
     }
 
